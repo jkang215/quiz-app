@@ -42,7 +42,8 @@ app.get("/quiz/:id", (req, res) => {
   const quizID = req.params.id;
 
   if (quizID !== "0") {
-    res.send(404);
+    res.status(404);
+    res.send(`Quiz ${quizID} not found!`);
     return;
   }
 
