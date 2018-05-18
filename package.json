@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server/router.js",
+    "start": "nodemon server/app.js",
     "webpack": "webpack"
   },
   "repository": {
@@ -24,6 +24,7 @@
     "babel-preset-react": "^6.24.1",
     "body-parser": "^1.18.3",
     "cookie-parse": "^0.4.0",
+    "cookie-parser": "^1.4.3",
     "express": "^4.16.3",
     "isomorphic-fetch": "^2.2.1",
     "react": "^16.3.2",

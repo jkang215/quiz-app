@@ -122,7 +122,9 @@ class App extends Component {
         );
       } else {
         // Render SelectUser component
-
+        return (
+          <SelectUser showLobby={this.showLobby} />
+        );
       }
     } else {
       return (
