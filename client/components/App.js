@@ -1,10 +1,10 @@
-import fetch from 'isomorphic-fetch';
-import React, { Component } from 'react';
-import SelectUser from './SelectUser';
-import Lobby from './Lobby';
-import Quiz from './Quiz';
-import Score from './Score';
-import SelectQuiz from './SelectQuiz';
+import fetch from "isomorphic-fetch";
+import React, { Component } from "react";
+import SelectUser from "./SelectUser";
+import Lobby from "./Lobby";
+import Quiz from "./Quiz";
+import Score from "./Score";
+import SelectQuiz from "./SelectQuiz";
 
 class App extends Component {
   constructor(props) {
@@ -22,10 +22,10 @@ class App extends Component {
   // lobbyID
   // quiz
   getInitialState() {
-    if (window.location.href.includes('/game/')) {
-      const parseURL = window.location.href.split('/');
+    if (window.location.href.includes("/game/")) {
+      const parseURL = window.location.href.split("/");
       return {
-        userID: '',
+        userID: "",
         gameID: parseURL[parseURL.length - 1],
         quiz: [],
         renderSelectQuiz: false,
@@ -33,19 +33,19 @@ class App extends Component {
         renderQuiz: false,
         renderScore: false,
         question: 0,
-        score: 0,
+        score: 0
       };
     }
     return {
-      userID: '',
-      gameID: '',
+      userID: "",
+      gameID: "",
       quiz: [],
       renderSelectQuiz: false,
       renderLobby: false,
       renderQuiz: false,
       renderScore: false,
       question: 0,
-      score: 0,
+      score: 0
     };
 
     // fetch('https://codesmith-quiz.herokuapp.com/get-state', {
@@ -72,18 +72,18 @@ class App extends Component {
   }
 
   showSelectQuiz() {
-    const username = document.getElementById('select-field').value;
+    const username = document.getElementById("select-field").value;
     if (username) {
-      fetch('https://codesmith-quiz.herokuapp.com/user', {
+      fetch("https://codesmith-quiz.herokuapp.com/user", {
         body: JSON.stringify({ displayName: username }),
-        credentials: 'include',
+        credentials: "include",
         headers: {
-          'content-type': 'application/json',
+          "content-type": "application/json"
         },
-        method: 'POST',
+        method: "POST"
       })
         .then(response => response.json())
-        .then((myJson) => {
+        .then(myJson => {
           const copy = Object.assign({}, this.state);
           copy.renderSelectQuiz = true;
           this.setState(copy);
@@ -98,36 +98,36 @@ class App extends Component {
       copy.renderLobby = true;
       copy.renderSelectQuiz = false;
       // Get request to get the quiz
-      fetch('https://codesmith-quiz.herokuapp.com/quiz/0', {
-        credentials: 'include',
+      fetch("https://codesmith-quiz.herokuapp.com/quiz/0", {
+        credentials: "include"
       })
         .then(response => response.json())
-        .then((quiz) => {
+        .then(quiz => {
           copy.quiz = quiz;
           this.setState(copy);
         });
     } else {
       // Post request to change database with username
-      fetch('https://codesmith-quiz.herokuapp.com/game', {
+      fetch("https://codesmith-quiz.herokuapp.com/game", {
         body: JSON.stringify({ quizID: 0 }),
-        credentials: 'include',
+        credentials: "include",
         headers: {
-          'content-type': 'application/json',
+          "content-type": "application/json"
         },
-        method: 'POST',
+        method: "POST"
       })
         .then(response => response.json())
-        .then((myJson) => {
+        .then(myJson => {
           const copy = Object.assign({}, this.state);
           copy.gameID = myJson.id;
           copy.renderLobby = true;
           copy.renderSelectQuiz = false;
           // Get request to get the quiz
-          fetch('https://codesmith-quiz.herokuapp.com/quiz/0', {
-            credentials: 'include',
+          fetch("https://codesmith-quiz.herokuapp.com/quiz/0", {
+            credentials: "include"
           })
             .then(response => response.json())
-            .then((quiz) => {
+            .then(quiz => {
               copy.quiz = quiz;
               this.setState(copy);
             });
@@ -155,7 +155,7 @@ class App extends Component {
     const timer = setInterval(() => {
       if (this.state.question !== this.state.quiz.length - 1) {
         // Check answer
-        let answers = document.querySelectorAll('.answer');
+        let answers = document.querySelectorAll(".answer");
         let answered = -1;
         for (let i = 0; i < answers.length; i += 1) {
           if (answers[i].checked) answered = i;
@@ -165,12 +165,13 @@ class App extends Component {
         copy.renderQuiz = false;
         copy.renderScore = true;
         copy.question = 0;
-        if (this.state.quiz[this.state.question].correct === answered) copy.score += 1;
+        if (this.state.quiz[this.state.question].correct === answered)
+          copy.score += 1;
         this.setState(copy);
         clearInterval(timer);
       } else {
         // Check answer
-        let answers = document.querySelectorAll('.answer');
+        let answers = document.querySelectorAll(".answer");
         let answered = -1;
         for (let i = 0; i < answers.length; i += 1) {
           if (answers[i].checked) answered = i;
@@ -178,7 +179,8 @@ class App extends Component {
         // Render next question
         const copy2 = Object.assign({}, this.state);
         copy2.question += 1;
-        if (this.state.quiz[this.state.question].correct === answered) copy2.score += 1;
+        if (this.state.quiz[this.state.question].correct === answered)
+          copy2.score += 1;
         this.setState(copy2);
       }
     }, 10000);
@@ -190,32 +192,27 @@ class App extends Component {
       // Conditional rendering
       if (this.state.renderLobby) {
         // Render the lobby component
-        return (
-          <Lobby showQuiz={this.showQuiz} />
-        );
+        return <Lobby showQuiz={this.showQuiz} />;
       } else if (this.state.renderQuiz) {
         // Render quiz component
-        return (
-          <Quiz quiz={this.state.quiz} question={this.state.question} />
-        );
+        return <Quiz quiz={this.state.quiz} question={this.state.question} />;
       } else if (this.state.renderScore) {
         // Render Score display component
         return (
-          <Score score={this.state.score} showLobbyFromScore={this.showLobbyFromScore} />
+          <Score
+            score={this.state.score}
+            showLobbyFromScore={this.showLobbyFromScore}
+          />
         );
       } else if (this.state.renderSelectQuiz) {
         // Render SelectQuiz component
-        return (
-          <SelectQuiz showLobbyFromSelect={this.showLobbyFromSelect} />
-        );
+        return <SelectQuiz showLobbyFromSelect={this.showLobbyFromSelect} />;
       }
       // Render SelectUser component
-      return (
-        <SelectUser showSelectQuiz={this.showSelectQuiz} />
-      );
+      return <SelectUser showSelectQuiz={this.showSelectQuiz} />;
     }
-    return (
-      <span>Loading...</span>
-    );
+    return <span>Loading...</span>;
   }
 }
+
+export default App;
