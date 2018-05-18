@@ -1,4 +1,5 @@
-// 3rd party modules
+// --------------- 3rd party modules ---------------
+
 const app = require("express")();
 const http = require("http");
 const server = http.createServer(app);
@@ -8,15 +9,16 @@ const bodyParser = require("body-parser");
 const jsonParser = bodyParser.json();
 const fs = require("fs");
 
-// local imports
+// --------------- local imports ---------------
+
 const cookieParser = require("cookie-parser");
 const User = require("./model/users");
 const Game = require("./model/game");
 
-// local variables
+// local variables ---------------
 const port = process.env.PORT || 3001;
 
-// routers
+// --------------- routers ---------------
 
 app.use(cookieParser());
 
@@ -24,8 +26,22 @@ app.get("/", function(req, res) {
   res.send("hello world!");
 });
 
-app.get("/quiz/:quizID", function(req, res) {
-  if (req.params.quizID !== "0") {
+app.get("/game/:id", (req, res) => {
+  const gameID = req.params.id;
+
+  res.status(404);
+  res.send(`No database configured for GAME! (requested ID: ${gameID})`);
+});
+
+app.post("/game", (req, res) => {
+  res.status(404);
+  res.send(`No database configured for GAME!`);
+});
+
+app.get("/quiz/:id", (req, res) => {
+  const quizID = req.params.id;
+
+  if (quizID !== "0") {
     res.send(404);
     return;
   }
@@ -38,8 +54,13 @@ app.get("/quiz/:quizID", function(req, res) {
 });
 
 app.post("/user", jsonParser, User.createUser, (req, res) => {
-  res.setHeader(`set-cookie`, `session=${res.locals.user.id}`);
-  res.json(res.locals.user);
+  if (res.locals.user) {
+    res.setHeader(`set-cookie`, `session=${res.locals.user.id}`);
+    res.json(res.locals.user);
+  } else {
+    res.status(404);
+    res.send("No database configured for USER!");
+  }
 });
 
 io.on("connection", function(socket) {
@@ -49,8 +70,3 @@ io.on("connection", function(socket) {
 server.listen(port, () => {
   console.log(`listening on PORT:${port}…`);
 });
-
-// app.get("/get-state", function(req, res) {
-//   const state = {};
-//
-// });
