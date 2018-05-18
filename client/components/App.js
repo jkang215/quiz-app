@@ -9,8 +9,9 @@ import SelectQuiz from './SelectQuiz';
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = this.getInitialState();
-    this.showLobby = this.showLobby.bind(this);
+    this.state = getInitialState();
+    this.showLobbyFromSelect = this.showLobbyFromSelect.bind(this);
+    this.showLobbyFromScore = this.showLobbyFromScore.bind(this);
     this.showQuiz = this.showQuiz.bind(this);
     this.socketLaunch = this.socketLaunch.bind(this);
   }
