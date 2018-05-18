@@ -9,7 +9,8 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = getInitialState();
-    this.showLobby = this.showLobby.bind(this);
+    this.showLobbyFromSelect = this.showLobbyFromSelect.bind(this);
+    this.showLobbyFromScore = this.showLobbyFromScore.bind(this);
     this.showQuiz = this.showQuiz.bind(this);
   }
 
@@ -133,7 +134,7 @@ class App extends Component {
       } else if (this.state.renderScore) {
         // Render Score display component
         return (
-          <Score score={this.state.score} showLobby={this.showLobby} />
+          <Score score={this.state.score} showLobby={this.showLobbyFromScore} />
         );
       } else {
         // Render SelectUser component
