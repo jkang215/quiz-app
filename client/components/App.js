@@ -9,18 +9,8 @@ import SelectQuiz from './SelectQuiz';
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      userID: '',
-      gameID: '',
-      quiz: [],
-      renderSelectQuiz: false,
-      renderLobby: false,
-      renderQuiz: false,
-      renderScore: false,
-      question: 0,
-      score: 0,
-    },
-      this.showLobby = this.showLobby.bind(this);
+    this.state = this.getInitialState();
+    this.showLobby = this.showLobby.bind(this);
     this.showQuiz = this.showQuiz.bind(this);
     this.socketLaunch = this.socketLaunch.bind(this);
   }
@@ -31,27 +21,52 @@ class App extends Component {
   // lobbyID
   // quiz
   getInitialState() {
-    fetch('https://codesmith-quiz.herokuapp.com/get-state', {
-      credentials: 'include',
-    })
-      .then(response => response.json())
-      .then((myJson) => {
-        this.setState({
-          userID: myJson.userID,
-          lobbyID: myJson.lobbyID,
-          quiz: myJson.quiz,
-          renderLobby: false,
-          renderQuiz: false,
-          renderScore: false,
-          question: 0,
-          score: 0,
-        });
-      });
+    if (window.location.href.includes('/game/')) {
+      const parseURL = window.location.href.split('/');
+      return {
+        userID: '',
+        gameID: parseURL[parseURL.length - 1],
+        quiz: [],
+        renderSelectQuiz: false,
+        renderLobby: false,
+        renderQuiz: false,
+        renderScore: false,
+        question: 0,
+        score: 0,
+      };
+    }
+    return {
+      userID: '',
+      gameID: '',
+      quiz: [],
+      renderSelectQuiz: false,
+      renderLobby: false,
+      renderQuiz: false,
+      renderScore: false,
+      question: 0,
+      score: 0,
+    };
+
+    // fetch('https://codesmith-quiz.herokuapp.com/get-state', {
+    //   credentials: 'include',
+    // })
+    //   .then(response => response.json())
+    //   .then((myJson) => {
+    //     this.setState({
+    //       userID: myJson.userID,
+    //       lobbyID: myJson.lobbyID,
+    //       quiz: myJson.quiz,
+    //       renderLobby: false,
+    //       renderQuiz: false,
+    //       renderScore: false,
+    //       question: 0,
+    //       score: 0,
+    //     });
+    //   });
   }
 
   // Update state to launch quiz from socket connection
   socketLaunch() {
-
     this.showQuiz();
   }
 
@@ -77,32 +92,46 @@ class App extends Component {
 
   // Trigger state change to show lobby after selecting a quiz
   showLobbyFromSelect() {
-
-    // Post request to change database with username
-    fetch('https://codesmith-quiz.herokuapp.com/game', {
-      body: JSON.stringify({ quizID: 0 }),
-      credentials: 'include',
-      headers: {
-        'content-type': 'application/json',
-      },
-      method: 'POST',
-    })
-      .then(response => response.json())
-      .then((myJson) => {
-        const copy = Object.assign({}, this.state);
-        copy.gameID = myJson.id;
-        copy.renderLobby = true;
-        copy.renderSelectQuiz = false;
-        // Get request to get the quiz
-        fetch('https://codesmith-quiz.herokuapp.com/quiz/0', {
-          credentials: 'include',
-        })
-          .then(response => response.json())
-          .then((quiz) => {
-            copy.quiz = quiz;
-            this.setState(copy);
-          });
-      });
+    if (this.state.gameID) {
+      const copy = Object.assign({}, this.state);
+      copy.renderLobby = true;
+      copy.renderSelectQuiz = false;
+      // Get request to get the quiz
+      fetch('https://codesmith-quiz.herokuapp.com/quiz/0', {
+        credentials: 'include',
+      })
+        .then(response => response.json())
+        .then((quiz) => {
+          copy.quiz = quiz;
+          this.setState(copy);
+        });
+    } else {
+      // Post request to change database with username
+      fetch('https://codesmith-quiz.herokuapp.com/game', {
+        body: JSON.stringify({ quizID: 0 }),
+        credentials: 'include',
+        headers: {
+          'content-type': 'application/json',
+        },
+        method: 'POST',
+      })
+        .then(response => response.json())
+        .then((myJson) => {
+          const copy = Object.assign({}, this.state);
+          copy.gameID = myJson.id;
+          copy.renderLobby = true;
+          copy.renderSelectQuiz = false;
+          // Get request to get the quiz
+          fetch('https://codesmith-quiz.herokuapp.com/quiz/0', {
+            credentials: 'include',
+          })
+            .then(response => response.json())
+            .then((quiz) => {
+              copy.quiz = quiz;
+              this.setState(copy);
+            });
+        });
+    }
   }
 
   // Trigger state change to show lobby from the score component after a game
@@ -166,7 +195,7 @@ class App extends Component {
       } else if (this.state.renderQuiz) {
         // Render quiz component
         return (
-          <Quiz quiz={quiz} question={this.state.question} />
+          <Quiz quiz={this.state.quiz} question={this.state.question} />
         );
       } else if (this.state.renderScore) {
         // Render Score display component
