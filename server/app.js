@@ -28,6 +28,11 @@ app.get("/", function(req, res) {
   res.sendFile(path.join(__dirname + "./../client/index.html"));
 });
 
+app.get("/build/bundle.js", function(req, res) {
+  // res.send("hello world!");
+  res.sendFile(path.join(__dirname + "./../build/bundle.js"));
+});
+
 app.get("/game/:id", (req, res) => {
   const gameID = req.params.id;
 
