@@ -47,7 +47,7 @@ class App extends Component {
   showLobbyFromSelect() {
     fetch()
       .then(response => response.json())
-      .then(myJson => {
+      .then((myJson) => {
         const copy = Object.assign({}, this.state);
         copy.renderLobby = true;
         copy.renderQuiz = false;
@@ -99,21 +99,6 @@ class App extends Component {
         this.setState(copy2);
       }
     }, 10000);
-  }
-
-  nextQuestion() {
-    if (this.state.question !== 0) {
-      // Check selected answer
-
-      // Render next question
-
-    } else if (this.state.question === this.state.quiz.length - 1) {
-      // Render last question then render score page
-
-    } else {
-      // Render first question
-
-    }
   }
 
   render() {
