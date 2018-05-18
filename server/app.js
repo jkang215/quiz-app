@@ -1,6 +1,9 @@
 // 3rd party modules
-const express = require("express");
-const app = express();
+const app = require("express")();
+const http = require("http");
+const server = http.createServer(app);
+const io = require("socket.io")(server);
+
 const bodyParser = require("body-parser");
 const jsonParser = bodyParser.json();
 const fs = require("fs");
@@ -8,6 +11,7 @@ const fs = require("fs");
 // local imports
 const cookieParser = require("cookie-parser");
 const User = require("./model/users");
+const Game = require("./model/game");
 
 // local variables
 const port = process.env.PORT || 3001;
@@ -15,10 +19,17 @@ const port = process.env.PORT || 3001;
 // routers
 
 app.use(cookieParser());
-// app.use(cookieMiddleware);
 
 app.get("/", function(req, res) {
   res.send("hello world!");
+});
+
+app.get("/quiz/0", function(req, res) {
+  const sampleQuiz = JSON.parse(
+    fs.readFileSync("./server/model/quiz-demo.json", "utf-8")
+  );
+
+  res.json(sampleQuiz);
 });
 
 app.post("/user", jsonParser, User.createUser, (req, res) => {
@@ -26,14 +37,15 @@ app.post("/user", jsonParser, User.createUser, (req, res) => {
   res.json(res.locals.user);
 });
 
-app.get("/get-state", function(req, res) {
-  const state = {};
-  const sampleQuiz = JSON.parse(
-    fs.readFileSync("./server/model/quiz-demo.json", "utf-8")
-  );
-
-  state.quiz = sampleQuiz;
-  res.json(sampleQuiz);
+io.on("connection", function(socket) {
+  console.log("a user connected");
 });
 
-app.listen(port);
+server.listen(port, () => {
+  console.log(`listening on PORT:${port}…`);
+});
+
+// app.get("/get-state", function(req, res) {
+//   const state = {};
+//
+// });
