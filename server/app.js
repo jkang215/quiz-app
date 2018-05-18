@@ -1,34 +1,79 @@
-var cookieMiddleware = require("./middleware/cookie");
-var express = require("express");
-var fs = require("fs");
-var app = express();
-var cookieParser = require("cookie-parser");
+// --------------- 3rd party modules ---------------
+
+const app = require("express")();
+const http = require("http");
+const server = http.createServer(app);
+const io = require("socket.io")(server);
+const path = require("path");
+
+const bodyParser = require("body-parser");
+const jsonParser = bodyParser.json();
+const fs = require("fs");
+
+// --------------- local imports ---------------
+
+const cookieParser = require("cookie-parser");
+const User = require("./model/users");
+const Game = require("./model/game");
+
+// local variables ---------------
+const port = process.env.PORT || 3001;
+
+// --------------- routers ---------------
 
 app.use(cookieParser());
-app.use(cookieMiddleware);
-
-// respond with "hello world" when a GET request is made to the homepage
-// app.use((req, res) => {
-//   console.log("Cookies: ", req.cookies);
-//   res.cookie("userID", "someuserid");
-// });
 
 app.get("/", function(req, res) {
-  res.send("hello world");
+  // res.send("hello world!");
+  res.sendFile(path.join(__dirname + "./../client/index.html"));
 });
 
-app.get("/get-state", function(req, res) {
-  const state = {};
+app.get("/game/:id", (req, res) => {
+  const gameID = req.params.id;
+
+  res.status(404);
+  res.send(`No database configured for GAME! (requested ID: ${gameID})`);
+});
+
+app.post("/game", (req, res) => {
+  res.status(404);
+  res.send(`No database configured for GAME!`);
+});
+
+app.get("/quiz/:id", (req, res) => {
+  const quizID = req.params.id;
+
+  if (quizID !== "0") {
+    res.status(404);
+    res.send(`Quiz ${quizID} not found!`);
+    return;
+  }
+
   const sampleQuiz = JSON.parse(
     fs.readFileSync("./server/model/quiz-demo.json", "utf-8")
   );
 
-  state.quiz = sampleQuiz;
   res.json(sampleQuiz);
 });
 
-app.get("/game", function(req, res) {
-  // res.send("hello world");
+app.post("/user", jsonParser, User.createUser, (req, res) => {
+  if (res.locals.user) {
+    res.setHeader(`set-cookie`, `session=${res.locals.user.id}`);
+    res.json(res.locals.user);
+  } else {
+    res.status(404);
+    res.send("No database configured for USER!");
+  }
 });
 
-app.listen(3001);
+io.on("connection", function(socket) {
+  console.log("a user connected");
+
+  socket.on("chat message", function(msg) {
+    console.log("message: " + msg);
+  });
+});
+
+server.listen(port, () => {
+  console.log(`listening on PORT:${port}…`);
+});

@@ -4,6 +4,7 @@ import SelectUser from './SelectUser';
 import Lobby from './Lobby';
 import Quiz from './Quiz';
 import Score from './Score';
+import SelectQuiz from './SelectQuiz';
 
 class App extends Component {
   constructor(props) {
@@ -12,6 +13,7 @@ class App extends Component {
     this.showLobbyFromSelect = this.showLobbyFromSelect.bind(this);
     this.showLobbyFromScore = this.showLobbyFromScore.bind(this);
     this.showQuiz = this.showQuiz.bind(this);
+    this.socketLaunch = this.socketLaunch.bind(this);
   }
 
   // Send a fetch to server to decide what state should be
@@ -20,11 +22,11 @@ class App extends Component {
   // lobbyID
   // quiz
   getInitialState() {
-    fetch(url, {
+    fetch('https://codesmith-quiz.herokuapp.com/get-state', {
       credentials: 'include',
     })
       .then(response => response.json())
-      .then(myJson => {
+      .then((myJson) => {
         this.setState({
           userID: myJson.userID,
           lobbyID: myJson.lobbyID,
@@ -44,18 +46,57 @@ class App extends Component {
     this.showQuiz();
   }
 
-  // Trigger state change to show lobby
+  showSelectQuiz() {
+    const username = document.getElementById('select-field').value;
+    if (username) {
+      fetch('https://codesmith-quiz.herokuapp.com/user', {
+        body: JSON.stringify({ displayName: username }),
+        credentials: 'include',
+        headers: {
+          'content-type': 'application/json',
+        },
+        method: 'POST',
+      })
+        .then(response => response.json())
+        .then((myJson) => {
+          const copy = Object.assign({}, this.state);
+          copy.renderSelectQuiz = true;
+          this.setState(copy);
+        });
+    }
+  }
+
+  // Trigger state change to show lobby after selecting a quiz
   showLobbyFromSelect() {
-    fetch()
+
+    // Post request to change database with username
+    fetch('https://codesmith-quiz.herokuapp.com/game', {
+      body: JSON.stringify({ quizID: 0 }),
+      credentials: 'include',
+      headers: {
+        'content-type': 'application/json',
+      },
+      method: 'POST',
+    })
       .then(response => response.json())
-      .then(myJson => {
+      .then((myJson) => {
         const copy = Object.assign({}, this.state);
+        copy.gameID = myJson.id;
         copy.renderLobby = true;
-        copy.renderQuiz = false;
-        this.setState(copy);
+        copy.renderSelectQuiz = false;
+        // Get request to get the quiz
+        fetch('https://codesmith-quiz.herokuapp.com/quiz/0', {
+          credentials: 'include',
+        })
+          .then(response => response.json())
+          .then((quiz) => {
+            copy.quiz = quiz;
+            this.setState(copy);
+          });
       });
   }
 
+  // Trigger state change to show lobby from the score component after a game
   showLobbyFromScore() {
     const copy = Object.assign({}, this.state);
     copy.renderLobby = true;
@@ -65,12 +106,14 @@ class App extends Component {
 
   // Trigger state change to show quiz
   showQuiz() {
+    // Socket magic to initiate a quiz
+
     const copy = Object.assign({}, this.state);
     copy.renderLobby = false;
     copy.renderQuiz = true;
     copy.question = 0;
     this.setState(copy);
-    let timer = setInterval(() => {
+    const timer = setInterval(() => {
       if (this.state.question !== this.state.quiz.length - 1) {
         // Check answer
         let answers = document.querySelectorAll('.answer');
@@ -102,21 +145,6 @@ class App extends Component {
     }, 10000);
   }
 
-  nextQuestion() {
-    if (this.state.question !== 0) {
-      // Check selected answer
-
-      // Render next question
-
-    } else if (this.state.question === this.state.quiz.length - 1) {
-      // Render last question then render score page
-
-    } else {
-      // Render first question
-
-    }
-  }
-
   render() {
     // Check if state is defined from getInitialState
     if (this.state) {
@@ -134,18 +162,21 @@ class App extends Component {
       } else if (this.state.renderScore) {
         // Render Score display component
         return (
-          <Score score={this.state.score} showLobby={this.showLobbyFromScore} />
+          <Score score={this.state.score} showLobbyFromScore={this.showLobbyFromScore} />
         );
-      } else {
-        // Render SelectUser component
+      } else if (this.state.renderSelectQuiz) {
+        // Render SelectQuiz component
         return (
-          <SelectUser showLobby={this.showLobby} />
+          <SelectQuiz showLobbyFromSelect={this.showLobbyFromSelect} />
         );
       }
-    } else {
+      // Render SelectUser component
       return (
-        <span>Loading...</span>
+        <SelectUser showSelectQuiz={this.showSelectQuiz} />
       );
     }
+    return (
+      <span>Loading...</span>
+    );
   }
 }
