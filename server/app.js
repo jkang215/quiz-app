@@ -24,7 +24,12 @@ app.get("/", function(req, res) {
   res.send("hello world!");
 });
 
-app.get("/quiz/0", function(req, res) {
+app.get("/quiz/:quizID", function(req, res) {
+  if (req.params.quizID !== "0") {
+    res.send(404);
+    return;
+  }
+
   const sampleQuiz = JSON.parse(
     fs.readFileSync("./server/model/quiz-demo.json", "utf-8")
   );
