@@ -1,0 +1,30 @@
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz App</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4"
+    crossorigin="anonymous" <link rel="stylesheet" href="client/stylesheets/styles.css">
+</head>
+
+<body>
+  <h1 id="main-title">QUIZ APP</h1>
+  <div id="root"></div>
+
+  <script src="build/bundle.js"></script>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  <script>
+    $(function () {
+      var socket = io();
+
+      setTimeout(function () {
+        socket.emit('chat message', "hello socket!");
+      }, 1000);
+    });
+  </script>
+
+</body>
+
+</html>
