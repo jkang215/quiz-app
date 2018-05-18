@@ -4,6 +4,7 @@ const app = require("express")();
 const http = require("http");
 const server = http.createServer(app);
 const io = require("socket.io")(server);
+const path = require("path");
 
 const bodyParser = require("body-parser");
 const jsonParser = bodyParser.json();
@@ -23,7 +24,8 @@ const port = process.env.PORT || 3001;
 app.use(cookieParser());
 
 app.get("/", function(req, res) {
-  res.send("hello world!");
+  // res.send("hello world!");
+  res.sendFile(path.join(__dirname + "./../client/index.html"));
 });
 
 app.get("/game/:id", (req, res) => {
@@ -66,6 +68,10 @@ app.post("/user", jsonParser, User.createUser, (req, res) => {
 
 io.on("connection", function(socket) {
   console.log("a user connected");
+
+  socket.on("chat message", function(msg) {
+    console.log("message: " + msg);
+  });
 });
 
 server.listen(port, () => {
