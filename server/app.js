@@ -16,7 +16,7 @@ app.use(cookieParser());
 app.use(cookieMiddleware);
 
 app.get("/", function(req, res) {
-  res.send("hello world");
+  res.send("hello world!");
 });
 
 app.get("/get-state", function(req, res) {
