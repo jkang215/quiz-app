@@ -24,6 +24,12 @@ const port = process.env.PORT || 3001;
 
 app.use(cookieParser());
 
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 app.get("/", function(req, res) {
   // res.send("hello world!");
   res.sendFile(path.join(__dirname + "./../client/index.html"));
@@ -80,10 +86,17 @@ app.post("/user", jsonParser, User.createUser, (req, res) => {
   }
 });
 
-io.on("connection", function(socket) {
+io.on("connection", function(client) {
   console.log("a user connected");
 
-  socket.on("chat message", function(msg) {
+  client.on('startQuiz', (quiz) => {
+    const sampleQuiz = JSON.parse(
+      fs.readFileSync("./server/model/quiz-demo.json", "utf-8")
+    );
+    client.broadcast.emit('quiz', sampleQuiz);
+  });
+
+  client.on("chat message", function(msg) {
     console.log("message: " + msg);
   });
 });
