@@ -12,8 +12,12 @@ const SelectUser = props => {
           type="text"
           placeholder="Username"
         />
-        <button className="btn btn-primary" onClick={() => props.showLobby()}>
-          Submit Usery
+        <button
+          className="btn btn-primary"
+          type="button"
+          onClick={() => props.showSelectQuiz()}
+        >
+          Submit User
         </button>
       </div>
     </form>
