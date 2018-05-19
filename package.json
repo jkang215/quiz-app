@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server/router.js",
+    "start": "nodemon server/app.js",
     "webpack": "webpack"
   },
   "repository": {
@@ -24,13 +24,19 @@
     "babel-preset-react": "^6.24.1",
     "body-parser": "^1.18.3",
     "cookie-parse": "^0.4.0",
+    "cookie-parser": "^1.4.3",
     "express": "^4.16.3",
+<<<<<<< HEAD
     "heroku": "^7.0.47",
+=======
+    "http": "0.0.0",
+>>>>>>> 26d6453685bd66a0d7605cbf2035dcb14e4ca902
     "isomorphic-fetch": "^2.2.1",
     "pg": "^7.4.3",
     "psql": "0.0.1",
     "react": "^16.3.2",
-    "react-dom": "^16.3.2"
+    "react-dom": "^16.3.2",
+    "socket.io": "^2.1.1"
   },
   "devDependencies": {
     "nodemon": "^1.17.4",

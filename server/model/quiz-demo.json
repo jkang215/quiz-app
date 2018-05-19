@@ -1,0 +1,37 @@
+[
+  {
+    "query": "What question number is this?",
+    "answers": ["1", "2", "3", "4"],
+    "correct": 0
+  },
+  {
+    "query": "Does the quiz correctly handle displaying more than 4 answers?",
+    "answers": ["no", "no", "no", "no", "yes"],
+    "correct": 4
+  },
+  {
+    "query": "Does the quiz correctly handle displaying less than 4 answers?",
+    "answers": ["yes"],
+    "correct": 0
+  },
+  {
+    "query": "Which team is the best?",
+    "answers": [
+      "Tasselled wobbegong",
+      "Red-lipped batfish",
+      "Goblin shark",
+      "Hellbender"
+    ],
+    "correct": 1
+  },
+  {
+    "query": "const a = [1,2];\na[1.5] = 1.5;\nWhat does a.length return?",
+    "answers": ["2", "3", "(throws error)", "undefined"],
+    "correct": 0
+  },
+  {
+    "query": "const a = [1,2];\na[1.5] = 1.5;\nWhat does a[1.5] return?",
+    "answers": ["undefined", "(throws error)", "1.5", "2"],
+    "correct": 2
+  }
+]
