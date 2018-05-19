@@ -1,10 +1,14 @@
-import fetch from "isomorphic-fetch";
-import React, { Component } from "react";
-import SelectUser from "./SelectUser";
-import Lobby from "./Lobby";
-import Quiz from "./Quiz";
-import Score from "./Score";
-import SelectQuiz from "./SelectQuiz";
+import fetch from 'isomorphic-fetch';
+import React, { Component } from 'react';
+import SelectUser from './SelectUser';
+import Lobby from './Lobby';
+import Quiz from './Quiz';
+import Score from './Score';
+import SelectQuiz from './SelectQuiz';
+import startQuiz from './../src/api';
+
+const url = 'http://localhost:3001/';
+// const url = 'https://codesmith-quiz.herokuapp.com/';
 
 class App extends Component {
   constructor(props) {
@@ -17,16 +21,11 @@ class App extends Component {
     this.socketLaunch = this.socketLaunch.bind(this);
   }
 
-  // Send a fetch to server to decide what state should be
-  // Server response:
-  // userID
-  // lobbyID
-  // quiz
   getInitialState() {
-    if (window.location.href.includes("/game/")) {
-      const parseURL = window.location.href.split("/");
+    if (window.location.href.includes('/game/')) {
+      const parseURL = window.location.href.split('/');
       return {
-        userID: "",
+        userID: '',
         gameID: parseURL[parseURL.length - 1],
         quiz: [],
         renderSelectQuiz: false,
@@ -34,62 +33,59 @@ class App extends Component {
         renderQuiz: false,
         renderScore: false,
         question: 0,
-        score: 0
+        score: 0,
       };
     }
     return {
-      userID: "",
-      gameID: "",
+      userID: '',
+      gameID: '',
       quiz: [],
       renderSelectQuiz: false,
       renderLobby: false,
       renderQuiz: false,
       renderScore: false,
       question: 0,
-      score: 0
+      score: 0,
     };
-
-    // fetch('https://codesmith-quiz.herokuapp.com/get-state', {
-    //   credentials: 'include',
-    // })
-    //   .then(response => response.json())
-    //   .then((myJson) => {
-    //     this.setState({
-    //       userID: myJson.userID,
-    //       lobbyID: myJson.lobbyID,
-    //       quiz: myJson.quiz,
-    //       renderLobby: false,
-    //       renderQuiz: false,
-    //       renderScore: false,
-    //       question: 0,
-    //       score: 0,
-    //     });
-    //   });
   }
 
   // Update state to launch quiz from socket connection
   socketLaunch() {
-    this.showQuiz();
+    startQuiz((err, quiz) => {
+      this.setState({ quiz });
+      this.showQuiz();
+    });
   }
 
   showSelectQuiz() {
-    const username = document.getElementById("select-field").value;
-    if (username) {
-      fetch("https://codesmith-quiz.herokuapp.com/user", {
-        body: JSON.stringify({ displayName: username }),
-        credentials: "include",
-        headers: {
-          "content-type": "application/json"
-        },
-        method: "POST"
-      })
-        .then(response => response.json())
-        .then(myJson => {
-          const copy = Object.assign({}, this.state);
-          copy.renderSelectQuiz = true;
-          this.setState(copy);
-        });
-    }
+    const username = document.getElementById('select-field').value;
+    // if (username) {
+    //   fetch(`${url}user`, {
+    //     body: JSON.stringify({ displayName: username }),
+    //     credentials: 'include',
+    //     headers: {
+    //       'content-type': 'application/json',
+    //     },
+    //     method: 'POST',
+    //   })
+    //     .then(response => response.json())
+    //     .then((myJson) => {
+    //       const copy = Object.assign({}, this.state);
+    //       copy.renderSelectQuiz = true;
+    //       this.setState(copy);
+    //     });
+    // }
+    fetch(`${url}quiz/0`, {
+      credentials: 'include',
+    })
+      .then(response => response.json())
+      .then((quiz) => {
+        console.log(quiz);
+        const copy = Object.assign({}, this.state);
+        copy.quiz = quiz;
+        this.setState(copy);
+        this.showQuiz();
+      });
   }
 
   // Trigger state change to show lobby after selecting a quiz
@@ -99,36 +95,36 @@ class App extends Component {
       copy.renderLobby = true;
       copy.renderSelectQuiz = false;
       // Get request to get the quiz
-      fetch("https://codesmith-quiz.herokuapp.com/quiz/0", {
-        credentials: "include"
+      fetch(`${url}quiz/0`, {
+        credentials: 'include',
       })
         .then(response => response.json())
-        .then(quiz => {
+        .then((quiz) => {
           copy.quiz = quiz;
           this.setState(copy);
         });
     } else {
       // Post request to change database with username
-      fetch("https://codesmith-quiz.herokuapp.com/game", {
+      fetch(`${url}game`, {
         body: JSON.stringify({ quizID: 0 }),
-        credentials: "include",
+        credentials: 'include',
         headers: {
-          "content-type": "application/json"
+          'content-type': 'application/json',
         },
-        method: "POST"
+        method: 'POST',
       })
         .then(response => response.json())
-        .then(myJson => {
+        .then((myJson) => {
           const copy = Object.assign({}, this.state);
           copy.gameID = myJson.id;
           copy.renderLobby = true;
           copy.renderSelectQuiz = false;
           // Get request to get the quiz
-          fetch("https://codesmith-quiz.herokuapp.com/quiz/0", {
-            credentials: "include"
+          fetch(`${url}quiz/0`, {
+            credentials: 'include',
           })
             .then(response => response.json())
-            .then(quiz => {
+            .then((quiz) => {
               copy.quiz = quiz;
               this.setState(copy);
             });
@@ -146,7 +142,7 @@ class App extends Component {
 
   // Trigger state change to show quiz
   showQuiz() {
-    // Socket magic to initiate a quiz
+    // this.socketLaunch();
 
     const copy = Object.assign({}, this.state);
     copy.renderLobby = false;
@@ -154,9 +150,11 @@ class App extends Component {
     copy.question = 0;
     this.setState(copy);
     const timer = setInterval(() => {
-      if (this.state.question !== this.state.quiz.length - 1) {
+      console.log('state quiz length', this.state.quiz.length);
+      console.log('state question', this.state.question);
+      if (this.state.question === this.state.quiz.length - 1) {
         // Check answer
-        let answers = document.querySelectorAll(".answer");
+        const answers = document.querySelectorAll('.answer');
         let answered = -1;
         for (let i = 0; i < answers.length; i += 1) {
           if (answers[i].checked) answered = i;
@@ -166,13 +164,12 @@ class App extends Component {
         copy.renderQuiz = false;
         copy.renderScore = true;
         copy.question = 0;
-        if (this.state.quiz[this.state.question].correct === answered)
-          copy.score += 1;
+        if (this.state.quiz[this.state.question].correct === answered) copy.score += 1;
         this.setState(copy);
         clearInterval(timer);
       } else {
         // Check answer
-        let answers = document.querySelectorAll(".answer");
+        const answers = document.querySelectorAll('.answer');
         let answered = -1;
         for (let i = 0; i < answers.length; i += 1) {
           if (answers[i].checked) answered = i;
@@ -180,8 +177,7 @@ class App extends Component {
         // Render next question
         const copy2 = Object.assign({}, this.state);
         copy2.question += 1;
-        if (this.state.quiz[this.state.question].correct === answered)
-          copy2.score += 1;
+        if (this.state.quiz[this.state.question].correct === answered) copy2.score += 1;
         this.setState(copy2);
       }
     }, 10000);
