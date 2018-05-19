@@ -7,7 +7,7 @@ const SelectUser = (props) => {
         <div className="form-group">
           <label htmlFor="select-field">Select User</label>
           <input id="select-field" className="form-control" name="username" type="text" placeholder="Username" />
-          <button className="btn btn-primary" onClick={() => props.showLobby()}>Submit User</button>
+          <button className="btn btn-primary" type="button" onClick={() => props.showSelectQuiz()}>Submit User</button>
         </div>
       </form>
   );
