@@ -26,11 +26,7 @@
     "cookie-parse": "^0.4.0",
     "cookie-parser": "^1.4.3",
     "express": "^4.16.3",
-<<<<<<< HEAD
-    "heroku": "^7.0.47",
-=======
     "http": "0.0.0",
->>>>>>> 26d6453685bd66a0d7605cbf2035dcb14e4ca902
     "isomorphic-fetch": "^2.2.1",
     "pg": "^7.4.3",
     "psql": "0.0.1",

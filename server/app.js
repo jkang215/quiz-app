@@ -15,6 +15,7 @@ const fs = require("fs");
 const cookieParser = require("cookie-parser");
 const User = require("./model/users");
 const Game = require("./model/game");
+const database = require("./database.js");
 
 // local variables ---------------
 const port = process.env.PORT || 3001;
@@ -79,6 +80,9 @@ io.on("connection", function(socket) {
   });
 });
 
+database.connect();
+
 server.listen(port, () => {
   console.log(`listening on PORT:${port}…`);
 });
+
