@@ -5,7 +5,7 @@ const SelectQuiz = (props) => {
   return (
     <form id="selectQuiz-form">
       <div className="form-group">
-        <button className="btn btn-primary" onClick={() => props.showLobbyFromSelect()}>Quiz 1</button>
+        <button className="btn btn-primary" type="button" onClick={() => props.showLobbyFromSelect()}>Quiz 1</button>
       </div>
     </form>
   );
