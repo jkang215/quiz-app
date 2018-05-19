@@ -12,6 +12,7 @@ class App extends Component {
     this.state = this.getInitialState();
     this.showLobbyFromSelect = this.showLobbyFromSelect.bind(this);
     this.showLobbyFromScore = this.showLobbyFromScore.bind(this);
+    this.showSelectQuiz = this.showSelectQuiz.bind(this);
     this.showQuiz = this.showQuiz.bind(this);
     this.socketLaunch = this.socketLaunch.bind(this);
   }
