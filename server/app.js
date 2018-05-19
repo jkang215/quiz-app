@@ -46,6 +46,14 @@ app.post("/game", (req, res) => {
   res.send(`No database configured for GAME!`);
 });
 
+// <TESTING>
+app.get("/game", Game.createGame, (req, res) => {
+  // res.status(404);
+  console.log("Back in game route…");
+  res.send("DB did something…");
+});
+// </TESTING>
+
 app.get("/quiz/:id", (req, res) => {
   const quizID = req.params.id;
 
@@ -80,9 +88,12 @@ io.on("connection", function(socket) {
   });
 });
 
-database.connect();
+console.log("connect to db");
+database.connect(err => {
+  console.log("connected?");
+  console.log(`err: ${err}`);
+});
 
 server.listen(port, () => {
   console.log(`listening on PORT:${port}…`);
 });
-
